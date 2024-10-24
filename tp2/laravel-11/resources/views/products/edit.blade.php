@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Edit Products - SantriKoding.com</title>
+    <title>Edit Product - SantriKoding.com</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body style="background: lightgray">
@@ -17,14 +17,31 @@
                         <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
                         
                             @csrf
-                            @method('PUT')
+                            @method('PUT') <!-- Specify the PUT method for updating -->
 
                             <div class="form-group mb-3">
                                 <label class="font-weight-bold">IMAGE</label>
                                 <input type="file" class="form-control @error('image') is-invalid @enderror" name="image">
                             
-                                <!-- error message untuk image -->
+                                <!-- Display current image -->
+                                @if ($product->image)
+                                    <img src="{{ asset('storage/products/' . $product->image) }}" alt="{{ $product->title }}" class="img-thumbnail mt-2" width="150">
+                                @endif
+
+                                <!-- error message for image -->
                                 @error('image')
+                                    <div class="alert alert-danger mt-2">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="font-weight-bold">DEADLINE</label>
+                                <input type="date" class="form-control @error('deadline') is-invalid @enderror" name="deadline" value="{{ old('deadline', $product->deadline) }}">
+                            
+                                <!-- error message for deadline -->
+                                @error('deadline')
                                     <div class="alert alert-danger mt-2">
                                         {{ $message }}
                                     </div>
@@ -35,7 +52,7 @@
                                 <label class="font-weight-bold">TITLE</label>
                                 <input type="text" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ old('title', $product->title) }}" placeholder="Masukkan Judul Product">
                             
-                                <!-- error message untuk title -->
+                                <!-- error message for title -->
                                 @error('title')
                                     <div class="alert alert-danger mt-2">
                                         {{ $message }}
@@ -45,9 +62,9 @@
 
                             <div class="form-group mb-3">
                                 <label class="font-weight-bold">DESCRIPTION</label>
-                                <textarea class="form-control @error('description') is-invalid @enderror" name="description" rows="5" placeholder="Masukkan Description Product">{{ old('description', $product->description) }}</textarea>
+                                <textarea class="form-control @error('description') is-invalid @enderror" name="description" rows="5" placeholder="Masukkan Deskripsi Product">{{ old('description', $product->description) }}</textarea>
                             
-                                <!-- error message untuk description -->
+                                <!-- error message for description -->
                                 @error('description')
                                     <div class="alert alert-danger mt-2">
                                         {{ $message }}
@@ -58,23 +75,30 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
-                                        <label class="font-weight-bold">PRICE</label>
-                                        <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ old('price', $product->price) }}" placeholder="Masukkan Harga Product">
-                                    
-                                        <!-- error message untuk price -->
-                                        @error('price')
+                                        <label class="font-weight-bold">STATUS</label>
+                                        <select class="form-control @error('status') is-invalid @enderror" name="status">
+                                            <option value="" disabled>Select Status</option>
+                                            <option value="available" {{ (old('status', $product->status) == 'available') ? 'selected' : '' }}>Available</option>
+                                            <option value="Progress" {{ (old('status', $product->status) == 'Progress') ? 'selected' : '' }}>Progress</option>
+                                            <option value="Delayed" {{ (old('status', $product->status) == 'Delayed') ? 'selected' : '' }}>Delayed</option>
+                                            <option value="Done" {{ (old('status', $product->status) == 'Done') ? 'selected' : '' }}>Done</option>
+                                        </select>
+
+                                        <!-- error message for status -->
+                                        @error('status')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
                                             </div>
                                         @enderror
                                     </div>
                                 </div>
+
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
                                         <label class="font-weight-bold">STOCK</label>
                                         <input type="number" class="form-control @error('stock') is-invalid @enderror" name="stock" value="{{ old('stock', $product->stock) }}" placeholder="Masukkan Stock Product">
                                     
-                                        <!-- error message untuk stock -->
+                                        <!-- error message for stock -->
                                         @error('stock')
                                             <div class="alert alert-danger mt-2">
                                                 {{ $message }}
@@ -85,7 +109,7 @@
                             </div>
 
                             <button type="submit" class="btn btn-md btn-primary me-3">UPDATE</button>
-                            <button type="reset" class="btn btn-md btn-warning">RESET</button>
+                            <a href="{{ route('products.index') }}" class="btn btn-md btn-secondary">BACK</a>
 
                         </form> 
                     </div>

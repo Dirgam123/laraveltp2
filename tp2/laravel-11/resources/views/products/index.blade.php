@@ -31,7 +31,7 @@
                                 <tr>
                                     <th scope="col">IMAGE</th>
                                     <th scope="col">TITLE</th>
-                                    <th scope="col">TASK</th>
+                                    <th scope="col">Detail Pekerjaan</th>
                                     <th scope="col">STATUS</th>
                                     <th scope="col">PROGRESS</th>
                                     <th scope="col" style="width: 20%">ACTIONS</th>

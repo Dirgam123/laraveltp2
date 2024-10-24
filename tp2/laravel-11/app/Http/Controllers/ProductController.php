@@ -24,7 +24,8 @@ class ProductController extends Controller
      *
      * @return void
      */
-public function index(Request $request) : View
+
+     public function index(Request $request) : View
 {
     // Get the search input, if any
     $search = $request->input('search');
@@ -124,52 +125,55 @@ public function index(Request $request) : View
      */
     public function update(Request $request, $id): RedirectResponse
     {
-        //validate form
-        $request->validate([
-            'image'         => 'image|mimes:jpeg,jpg,png|max:2048',
-            'title'         => 'required|min:5',
-            'description'   => 'required|min:10',
-            'stock'         => 'required|numeric'
-        ]);
+    // Validate form inputs
+    $request->validate([
+        'image'         => 'nullable|image|mimes:jpeg,jpg,png|max:2048', // 'nullable' means image is optional
+        'title'         => 'required|min:5',
+        'description'   => 'required|min:10',
+        'stock'         => 'required|numeric',
+        'deadline'      => 'required|date',
+        'status'        => 'required|string'
+    ]);
 
-        //get product by ID
-        $product = Product::findOrFail($id);
+    // Get the product by ID
+    $product = Product::findOrFail($id);
 
-        //check if image is uploaded
-        if ($request->hasFile('image')) {
+    // Check if an image was uploaded
+    if ($request->hasFile('image')) {
 
-            //upload new image
-            $image = $request->file('image');
-            $image->storeAs('public/products', $image->hashName());
+        // Upload new image
+        $image = $request->file('image');
+        $imageName = $image->hashName();
+        $image->storeAs('public/products', $imageName);
 
-            //delete old image
-            Storage::delete('public/products/'.$product->image);
-
-            //update product with new image
-            $product->update([
-    'image'         => $image->hashName(),
-    'title'         => $request->title,
-    'description'   => $request->description,
-    'stock'         => $request->stock,
-    'deadline'      => $request->deadline,
-    'status'        => $request->status,
-            ]);
-
-        } else {
-
-            //update product without image
-            $product->update([
-    'image'         => $image->hashName(),
-    'title'         => $request->title,
-    'description'   => $request->description,
-    'stock'         => $request->stock,
-    'deadline'      => $request->deadline,
-    'status'        => $request->status,
-            ]);
+        // Delete the old image if it exists
+        if ($product->image) {
+            Storage::delete('public/products/' . $product->image);
         }
 
-        //redirect to index
-        return redirect()->route('products.index')->with(['success' => 'Data Berhasil Diubah!']);
+        // Update product with new image
+        $product->update([
+            'image'         => $imageName,
+            'title'         => $request->title,
+            'description'   => $request->description,
+            'stock'         => $request->stock,
+            'deadline'      => $request->deadline,
+            'status'        => $request->status,
+        ]);
+
+    } else {
+        // Update product without changing the image
+        $product->update([
+            'title'         => $request->title,
+            'description'   => $request->description,
+            'stock'         => $request->stock,
+            'deadline'      => $request->deadline,
+            'status'        => $request->status,
+        ]);
+    }
+
+    // Redirect to index with success message
+    return redirect()->route('products.index')->with(['success' => 'Product updated successfully!']);
     }
     
     /**

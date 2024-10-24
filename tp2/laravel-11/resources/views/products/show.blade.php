@@ -23,12 +23,12 @@
                     <div class="card-body">
                         <h3>{{ $product->title }}</h3>
                         <hr/>
-                        <p>{{ "Rp " . number_format($product->price,2,',','.') }}</p>
+                        <p>{{ $product->status }}</p>
                         <code>
                             <p>{!! $product->description !!}</p>
                         </code>
                         <hr/>
-                        <p>Stock : {{ $product->stock }}</p>
+                        <p>Task List : {{ $product->stock }}</p>
                     </div>
                 </div>
             </div>
