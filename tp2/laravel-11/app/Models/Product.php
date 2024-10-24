@@ -20,5 +20,7 @@ class Product extends Model
         'description',
         'price',
         'stock',
+        'deadline',
+        'status',
     ];
 }

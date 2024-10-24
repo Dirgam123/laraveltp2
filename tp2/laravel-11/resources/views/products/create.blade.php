@@ -31,6 +31,18 @@
                             </div>
 
                             <div class="form-group mb-3">
+                                <label class="font-weight-bold">DEADLINE</label>
+                                <input type="date" class="form-control @error('deadline') is-invalid @enderror" name="deadline">
+                            
+                                <!-- error message untuk image -->
+                                @error('deadline')
+                                    <div class="alert alert-danger mt-2">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <div class="form-group mb-3">
                                 <label class="font-weight-bold">TITLE</label>
                                 <input type="text" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ old('title') }}" placeholder="Masukkan Judul Product">
                             
@@ -54,20 +66,30 @@
                                 @enderror
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label class="font-weight-bold">PRICE</label>
-                                        <input type="number" class="form-control @error('price') is-invalid @enderror" name="price" value="{{ old('price') }}" placeholder="Masukkan Harga Product">
-                                    
-                                        <!-- error message untuk price -->
-                                        @error('price')
-                                            <div class="alert alert-danger mt-2">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                </div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group mb-3">
+            <label class="font-weight-bold">STATUS</label>
+<select class="form-control @error('status') is-invalid @enderror" name="status">
+    <option value="" disabled>Select Status</option>
+    <option value="available" {{ (old('status') ?? $product->status ?? '') == 'available' ? 'selected' : '' }}>Available</option>
+    <option value="Progress" {{ (old('status') ?? $product->status ?? '') == 'Progress' ? 'selected' : '' }}>Progress</option>
+    <option value="Delayed" {{ (old('status') ?? $product->status ?? '') == 'Delayed' ? 'selected' : '' }}>Delayed</option>
+    <option value="Done" {{ (old('status') ?? $product->status ?? '') == 'Done' ? 'selected' : '' }}>Done</option>
+</select>
+
+
+            
+            <!-- error message for status -->
+            @error('status')
+                <div class="alert alert-danger mt-2">
+                    {{ $message }}
+                </div>
+            @enderror
+        </div>
+    </div>
+</div>
+
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
                                         <label class="font-weight-bold">STOCK</label>

@@ -24,14 +24,22 @@ class ProductController extends Controller
      *
      * @return void
      */
-    public function index() : View
-    {
-        //get all products
-        $products = Product::latest()->paginate(10);
+public function index(Request $request) : View
+{
+    // Get the search input, if any
+    $search = $request->input('search');
 
-        //render view with products
-        return view('products.index', compact('products'));
-    }
+    // Query to get products based on search input or get all products
+    $products = Product::when($search, function ($query, $search) {
+                    return $query->where('title', 'like', '%' . $search . '%');
+                })
+                ->latest()
+                ->paginate(10);
+
+    // Render the view with the products and the search query
+    return view('products.index', compact('products', 'search'));
+}
+
 
     /**
      * create
@@ -56,7 +64,6 @@ class ProductController extends Controller
             'image'         => 'required|image|mimes:jpeg,jpg,png|max:2048',
             'title'         => 'required|min:5',
             'description'   => 'required|min:10',
-            'price'         => 'required|numeric',
             'stock'         => 'required|numeric'
         ]);
 
@@ -66,11 +73,12 @@ class ProductController extends Controller
 
         //create product
         Product::create([
-            'image'         => $image->hashName(),
-            'title'         => $request->title,
-            'description'   => $request->description,
-            'price'         => $request->price,
-            'stock'         => $request->stock
+    'image'         => $image->hashName(),
+    'title'         => $request->title,
+    'description'   => $request->description,
+    'stock'         => $request->stock,
+    'deadline'      => $request->deadline,
+    'status'        => $request->status,
         ]);
 
         //redirect to index
@@ -121,7 +129,6 @@ class ProductController extends Controller
             'image'         => 'image|mimes:jpeg,jpg,png|max:2048',
             'title'         => 'required|min:5',
             'description'   => 'required|min:10',
-            'price'         => 'required|numeric',
             'stock'         => 'required|numeric'
         ]);
 
@@ -140,21 +147,24 @@ class ProductController extends Controller
 
             //update product with new image
             $product->update([
-                'image'         => $image->hashName(),
-                'title'         => $request->title,
-                'description'   => $request->description,
-                'price'         => $request->price,
-                'stock'         => $request->stock
+    'image'         => $image->hashName(),
+    'title'         => $request->title,
+    'description'   => $request->description,
+    'stock'         => $request->stock,
+    'deadline'      => $request->deadline,
+    'status'        => $request->status,
             ]);
 
         } else {
 
             //update product without image
             $product->update([
-                'title'         => $request->title,
-                'description'   => $request->description,
-                'price'         => $request->price,
-                'stock'         => $request->stock
+    'image'         => $image->hashName(),
+    'title'         => $request->title,
+    'description'   => $request->description,
+    'stock'         => $request->stock,
+    'deadline'      => $request->deadline,
+    'status'        => $request->status,
             ]);
         }
 
