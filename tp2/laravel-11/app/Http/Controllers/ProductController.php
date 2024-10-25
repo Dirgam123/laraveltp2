@@ -41,6 +41,31 @@ class ProductController extends Controller
     return view('products.index', compact('products', 'search'));
 }
 
+public function newtask($id)
+{
+    // Retrieve the product by ID
+    $product = Product::findOrFail($id);
+
+    // Render the 'newtask' view with the product data
+    return view('products.newtask', compact('product'));
+}
+
+public function updateDescription(Request $request, $id)
+{
+    // Validate the description
+    $request->validate([
+        'description' => 'required|min:10',
+    ]);
+
+    // Retrieve and update the product's description
+    $product = Product::findOrFail($id);
+    $product->update([
+        'description' => $request->description,
+    ]);
+
+    // Redirect to products.index with success message
+    return redirect()->route('products.index')->with(['success' => 'Description updated successfully!']);
+}
 
     /**
      * create
