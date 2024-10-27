@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 //import model product
 use App\Models\Product; 
 
@@ -25,7 +26,7 @@ class ProductController extends Controller
      * @return void
      */
 
-     public function index(Request $request) : View
+     public function index(Request $request)
 {
     // Get the search input, if any
     $search = $request->input('search');
@@ -37,8 +38,11 @@ class ProductController extends Controller
                 ->latest()
                 ->paginate(10);
 
-    // Render the view with the products and the search query
-    return view('products.index', compact('products', 'search'));
+    // Get unread notifications
+    $notifications = Notification::where('is_read', false)->get();
+
+    // Render the view with the products, search query, and notifications
+    return view('products.index', compact('products', 'search', 'notifications'));
 }
 
 public function newtask($id)

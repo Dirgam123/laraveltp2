@@ -17,14 +17,31 @@
                     <h5 class="text-center"><a href="https://github.com/Dirgam123">github</a></h5>
                     <hr>
                 </div>
+
+                <!-- Notification Section -->
+                <div class="mb-4">
+                    <h5>Notifications</h5>
+                    @if($notifications->isEmpty())
+                        <p class="text-muted">No new notifications.</p>
+                    @else
+                        @foreach($notifications as $notification)
+                            <div class="alert alert-warning">
+                                <strong>{{ $notification->title }}</strong>: {{ $notification->message }}
+                                <br>
+                                <small>{{ $notification->created_at->diffForHumans() }}</small>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+
                 <div class="card border-0 shadow-sm rounded">
                     <div class="card-body">
-                            <form action="{{ route('products.index') }}" method="GET">
-        <div class="input-group mb-3">
-            <input type="text" name="search" class="form-control" placeholder="Search Products" value="{{ request('search') }}">
-            <button class="btn btn-primary" type="submit">Search</button>
-        </div>
-    </form>
+                        <form action="{{ route('products.index') }}" method="GET">
+                            <div class="input-group mb-3">
+                                <input type="text" name="search" class="form-control" placeholder="Search Products" value="{{ request('search') }}">
+                                <button class="btn btn-primary" type="submit">Search</button>
+                            </div>
+                        </form>
                         <a href="{{ route('products.create') }}" class="btn btn-md btn-success mb-3">ADD PRODUCT</a>
                         <table class="table table-bordered">
                             <thead>
@@ -51,8 +68,7 @@
                                             <form onsubmit="return confirm('Apakah Anda Yakin ?');" action="{{ route('products.destroy', $product->id) }}" method="POST">
                                                 <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-dark">SHOW</a>
                                                 <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-primary">EDIT</a>
-<a href="{{ route('products.newtask', $product->id) }}" class="btn btn-sm btn-warning">+TASK</a>
-
+                                                <a href="{{ route('products.newtask', $product->id) }}" class="btn btn-sm btn-warning">+TASK</a>
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-danger">HAPUS</button>
@@ -77,7 +93,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        //message with sweetalert
+        // Message with SweetAlert
         @if(session('success'))
             Swal.fire({
                 icon: "success",
@@ -95,8 +111,6 @@
                 timer: 2000
             });
         @endif
-
     </script>
-
 </body>
 </html>
