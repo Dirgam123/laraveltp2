@@ -16,7 +16,6 @@
                     @csrf
                     @method('PUT')
 
-                    <!-- Task List Field -->
                     <div class="form-group mb-4">
                         <label class="font-weight-bold">TASK LIST</label>
 <textarea class="form-control @error('task_list') is-invalid @enderror" name="task_list" rows="5" placeholder="Enter tasks separated by commas">
@@ -30,7 +29,6 @@
                         @enderror
                     </div>
 
-                    <!-- Buttons for Submit and Back -->
                     <div class="d-flex justify-content-between">
                         <a href="{{ route('products.index') }}" class="btn btn-secondary">BACK</a>
                         <button type="submit" class="btn btn-primary">UPDATE TASK LIST</button>

@@ -3,23 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
-//import model product
 use App\Models\Product; 
-
-//import return type View
 use Illuminate\View\View;
-
-//import return type redirectResponse
 use Illuminate\Http\Request;
-
-//import Http Request
 use Illuminate\Http\RedirectResponse;
-
-//import Facades Storage
 use Illuminate\Support\Facades\Storage;
-
 use Carbon\Carbon;
-
 class ProductController extends Controller
 {
     /**
@@ -33,10 +22,8 @@ public function index(Request $request) : View
      $tasksPending = Product::where('deadline', '<=', Carbon::now()->addDays(3))
                             ->where('status', '!=', 'Done')
                             ->get();
-    // Get the search input, if any
     $search = $request->input('search');
 $products = Product::all();
-    // Query to get products based on search input or get all products
     $products = Product::when($search, function ($query, $search) {
                     return $query->where('title', 'like', '%' . $search . '%');
                 })
@@ -44,33 +31,27 @@ $products = Product::all();
                 ->paginate(10);
 
                 
-    // Render the view with the products and the search query
     return view('products.index', compact('products', 'search', 'tasksPending'));
 }
 
 public function newtask($id)
 {
-    // Retrieve the product by ID
     $product = Product::findOrFail($id);
 
-    // Render the 'newtask' view with the product data
     return view('products.newtask', compact('product'));
 }
 
 public function updateDescription(Request $request, $id)
 {
-    // Validate the description
     $request->validate([
         'description' => 'required|min:10',
     ]);
 
-    // Retrieve and update the product's description
     $product = Product::findOrFail($id);
     $product->update([
         'description' => $request->description,
     ]);
 
-    // Redirect to products.index with success message
     return redirect()->route('products.index')->with(['success' => 'Description updated successfully!']);
 }
 
@@ -104,14 +85,11 @@ public function store(Request $request): RedirectResponse
         'task_list' => 'nullable|string',
     ]);
 
-    // Upload the image
     $image = $request->file('image');
     $image->storeAs('public/products', $image->hashName());
 
-    // Convert task_list to JSON format if it’s a comma-separated string
 $taskListArray = explode(',', $request->input('task_list'));
 
-    // Create product
     Product::create([
         'image'         => $image->hashName(),
         'title'         => $request->title,
@@ -123,7 +101,6 @@ $taskListArray = explode(',', $request->input('task_list'));
         'task_list' => $taskListArray,
     ]);
 
-    // Redirect to index
     return redirect()->route('products.index')->with(['success' => 'Data Berhasil Disimpan!']);
 }
     
@@ -135,22 +112,18 @@ $taskListArray = explode(',', $request->input('task_list'));
      */
     public function show(string $id): View
     {
-        //get product by ID
         $product = Product::findOrFail($id);
 
-        //render view with product
         return view('products.show', compact('product'));
     }
     public function updateTaskList(Request $request, $id)
 {
     $product = Product::findOrFail($id);
 
-    // Validate task list (optional step depending on your requirements)
     $request->validate([
         'task_list' => 'required|string',
     ]);
 
-    // Update the task list as a JSON array
     $product->task_list = json_encode(explode(',', $request->task_list));
     $product->save();
 
@@ -165,10 +138,8 @@ $taskListArray = explode(',', $request->input('task_list'));
      */
     public function edit(string $id): View
     {
-        //get product by ID
         $product = Product::findOrFail($id);
 
-        //render view with product
         return view('products.edit', compact('product'));
     }
         
@@ -191,7 +162,6 @@ public function update(Request $request, $id)
 
     $product = Product::findOrFail($id);
 
-    // Handle image upload if a new image is provided
     if ($request->hasFile('image')) {
         if ($product->image && Storage::exists('public/products/' . $product->image)) {
             Storage::delete('public/products/' . $product->image);
@@ -200,17 +170,14 @@ public function update(Request $request, $id)
         $product->image = $image;
     }
 
-    // Process task_list as array or string
     $taskList = $request->input('task_list');
     $product->task_list = is_string($taskList) ? explode(',', $taskList) : $taskList;
 
-    // Update other fields
     $product->title = $request->input('title');
     $product->description = $request->input('description');
     $product->status = $request->input('status');
     $product->deadline = Carbon::parse($request->input('deadline'));
 
-    // Save the product
     $product->save();
 
     return redirect()->route('products.index')->with('success', 'Product updated successfully');
@@ -224,16 +191,12 @@ public function update(Request $request, $id)
      */
     public function destroy($id): RedirectResponse
     {
-        //get product by ID
         $product = Product::findOrFail($id);
 
-        //delete image
         Storage::delete('public/products/'. $product->image);
 
-        //delete product
         $product->delete();
 
-        //redirect to index
         return redirect()->route('products.index')->with(['success' => 'Data Berhasil Dihapus!']);
     }
 }

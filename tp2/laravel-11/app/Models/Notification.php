@@ -7,14 +7,12 @@ use Carbon\Carbon;
 
 class Notification extends Model
 {
-    // Specify the fillable fields
     protected $fillable = [
         'title',
         'message',
         'is_read',
     ];
 
-    // Define any casting if needed
     protected $casts = [
         'is_read' => 'boolean',
     ];

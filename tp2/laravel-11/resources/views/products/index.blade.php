@@ -19,7 +19,6 @@
                     <hr>
                 </div>
                 
-                <!-- Notifikasi Tugas Mendekati Deadline -->
                 @if($tasksPending->isNotEmpty())
                     <div id="notification" class="alert alert-warning text-center">
                         <strong>Perhatian:</strong> Ada tugas yang mendekati tenggat waktu!
@@ -34,7 +33,7 @@
                                 <button class="btn btn-primary" type="submit">Search</button>
                             </div>
                         </form>
-                        <a href="{{ route('products.create') }}" class="btn btn-md btn-success mb-3">ADD PRODUCT</a>
+                        <a href="{{ route('products.create') }}" class="btn btn-md btn-success mb-3">ADD PROJECT</a>
                         
                         <table class="table table-bordered">
                             <thead>
@@ -101,7 +100,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="text-center">Data Products belum Tersedia.</td>
+                                        <td colspan="7" class="text-center">Data Project belum Tersedia.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

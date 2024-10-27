@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Show Product - SantriKoding.com</title>
+    <title>Show Project</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body style="background: lightgray">
@@ -36,7 +36,7 @@
     @endphp
 
     @forelse ($taskList as $task)
-        <li>{{ trim($task) }}</li> <!-- Use trim to remove any extra spaces -->
+        <li>{{ trim($task) }}</li> 
     @empty
         <li>No tasks available.</li>
     @endforelse
@@ -46,7 +46,7 @@
             </div>
         </div>
         <div class="text-center mt-3">
-            <a href="{{ route('products.index') }}" class="btn btn-primary">Back to Products</a>
+            <a href="{{ route('products.index') }}" class="btn btn-primary">Back to Projects</a>
         </div>
     </div>
 

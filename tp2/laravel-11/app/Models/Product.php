@@ -18,8 +18,6 @@ class Product extends Model
         'image',
         'title',
         'description',
-        'price',
-        'stock',
         'deadline',
         'status',
         'task_list'
