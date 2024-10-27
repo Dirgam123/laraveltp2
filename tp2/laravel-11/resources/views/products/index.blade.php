@@ -15,7 +15,7 @@
             <div class="col-md-12">
                 <div>
                     <h3 class="text-center my-4">DIRGAM FAHLEVI</h3>
-                    <h5 class="text-center"><a href="https://github.com/Dirgam123">github</a></h5>
+                    <h3 class="text-center my-4">2502123325</h3>
                     <hr>
                 </div>
                 
