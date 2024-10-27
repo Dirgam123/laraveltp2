@@ -18,6 +18,8 @@ use Illuminate\Http\RedirectResponse;
 //import Facades Storage
 use Illuminate\Support\Facades\Storage;
 
+use Carbon\Carbon;
+
 class ProductController extends Controller
 {
     /**
@@ -28,6 +30,9 @@ class ProductController extends Controller
 
 public function index(Request $request) : View
 {
+     $tasksPending = Product::where('deadline', '<=', Carbon::now()->addDays(3))
+                            ->where('status', '!=', 'Done')
+                            ->get();
     // Get the search input, if any
     $search = $request->input('search');
 $products = Product::all();
@@ -40,7 +45,7 @@ $products = Product::all();
 
                 
     // Render the view with the products and the search query
-    return view('products.index', compact('products', 'search'));
+    return view('products.index', compact('products', 'search', 'tasksPending'));
 }
 
 public function newtask($id)
@@ -174,67 +179,42 @@ $taskListArray = explode(',', $request->input('task_list'));
      * @param  mixed $id
      * @return RedirectResponse
      */
-public function update(Request $request, $id): RedirectResponse
+public function update(Request $request, $id)
 {
-    // Validate form inputs
     $request->validate([
-        'image'         => 'nullable|image|mimes:jpeg,jpg,png|max:2048', // 'nullable' means image is optional
-        'title'         => 'required|min:5',
-        'description'   => 'required|min:10',
-        'stock'         => 'required|numeric',
-        'deadline'      => 'required|date',
-        'status'        => 'required|string',
-        'task_list'     => 'required|string',
-         // Validate task list as a string
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'status' => 'required',
+        'deadline' => 'required|date',
+        'task_list' => 'nullable|string',
     ]);
 
-    // Get the product by ID
     $product = Product::findOrFail($id);
 
-    // Prepare the task list as JSON
- $taskListArray = explode(',', $request->input('task_list')); // Convert task list to array
-
-
-    // Check if an image was uploaded
+    // Handle image upload if a new image is provided
     if ($request->hasFile('image')) {
-        // Upload new image
-        $image = $request->file('image');
-        $imageName = $image->hashName();
-        $image->storeAs('public/products', $imageName);
-
-        // Delete the old image if it exists
-        if ($product->image) {
+        if ($product->image && Storage::exists('public/products/' . $product->image)) {
             Storage::delete('public/products/' . $product->image);
         }
-
-        // Update product with new image and task list
-        $product->update([
-            'image'         => $imageName,
-            'title'         => $request->title,
-            'description'   => $request->description,
-            'stock'         => $request->stock,
-            'deadline'      => $request->deadline,
-            'status'        => $request->status,
-                    'title' => $request->title,
-        'task_list' => $taskListArray, // Save task list as JSON
-        ]);
-    } else {
-        // Update product without changing the image
-        $product->update([
-            'title'         => $request->title,
-            'description'   => $request->description,
-            'stock'         => $request->stock,
-            'deadline'      => $request->deadline,
-            'status'        => $request->status,
-                     'title' => $request->title,
-        'task_list' => $taskListArray,// Save task list as JSON
-        ]);
+        $image = $request->file('image')->store('products', 'public');
+        $product->image = $image;
     }
 
-    // Redirect to index with success message
-    return redirect()->route('products.index')->with(['success' => 'Product updated successfully!']);
-}
+    // Process task_list as array or string
+    $taskList = $request->input('task_list');
+    $product->task_list = is_string($taskList) ? explode(',', $taskList) : $taskList;
 
+    // Update other fields
+    $product->title = $request->input('title');
+    $product->description = $request->input('description');
+    $product->status = $request->input('status');
+    $product->deadline = Carbon::parse($request->input('deadline'));
+
+    // Save the product
+    $product->save();
+
+    return redirect()->route('products.index')->with('success', 'Product updated successfully');
+}
     
     /**
      * destroy

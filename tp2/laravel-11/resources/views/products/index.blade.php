@@ -18,6 +18,14 @@
                     <h5 class="text-center"><a href="https://github.com/Dirgam123">github</a></h5>
                     <hr>
                 </div>
+                
+                <!-- Notifikasi Tugas Mendekati Deadline -->
+                @if($tasksPending->isNotEmpty())
+                    <div id="notification" class="alert alert-warning text-center">
+                        <strong>Perhatian:</strong> Ada tugas yang mendekati tenggat waktu!
+                    </div>
+                @endif
+
                 <div class="card border-0 shadow-sm rounded">
                     <div class="card-body">
                         <form action="{{ route('products.index') }}" method="GET">
@@ -27,13 +35,15 @@
                             </div>
                         </form>
                         <a href="{{ route('products.create') }}" class="btn btn-md btn-success mb-3">ADD PRODUCT</a>
+                        
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th scope="col">IMAGE</th>
                                     <th scope="col">TITLE</th>
-                                    <th scope="col">Detail Pekerjaan</th>
+                                    <th scope="col">DETAIL PEKERJAAN</th>
                                     <th scope="col">STATUS</th>
+                                    <th scope="col">DEADLINE</th>
                                     <th scope="col">PROGRESS</th>
                                     <th scope="col" style="width: 20%">ACTIONS</th>
                                 </tr>
@@ -47,27 +57,35 @@
                                         <td>{{ $product->title }}</td>
                                         <td>
                                             <ul>
-@php
-    // Check if task_list is a valid JSON string
-    $taskList = is_string($product->task_list) ? json_decode($product->task_list, true) : $product->task_list;
-
-    // Ensure $taskList is an array
-    if (!is_array($taskList)) {
-        $taskList = [];
-    }
-@endphp
-                                                @if (empty($taskList) || (is_array($taskList) && count($taskList) === 0))
+                                                @php
+                                                    $taskList = is_string($product->task_list) ? json_decode($product->task_list, true) : $product->task_list;
+                                                    if (!is_array($taskList)) {
+                                                        $taskList = [];
+                                                    }
+                                                @endphp
+                                                @if (empty($taskList))
                                                     <li>No tasks available</li>
                                                 @else
                                                     @foreach ($taskList as $task)
-                                                        <li>{{ trim($task) }}</li> <!-- Use trim to remove any extra spaces -->
+                                                        <li>{{ trim($task) }}</li>
                                                     @endforeach
                                                 @endif
                                             </ul>
                                         </td>
                                         <td>{{ $product->status }}</td>
                                         <td>
-                                            <!-- Bar Chart for Progress -->
+                                            @php
+                                                $deadlineDate = \Carbon\Carbon::parse($product->deadline);
+                                                $daysLeft = $deadlineDate->diffInDays(\Carbon\Carbon::now());
+                                            @endphp
+                                            <span class="{{ $daysLeft <= 3 ? 'text-danger' : '' }}">
+                                                {{ $deadlineDate->format('Y-m-d') }}
+                                                @if($daysLeft <= 3)
+                                                    ({{ $daysLeft }} hari lagi)
+                                                @endif
+                                            </span>
+                                        </td>
+                                        <td>
                                             <canvas id="progressChart{{ $product->id }}" width="100" height="30"></canvas>
                                         </td>
                                         <td class="text-center">
@@ -83,7 +101,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">Data Products belum Tersedia.</td>
+                                        <td colspan="7" class="text-center">Data Products belum Tersedia.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -127,5 +145,6 @@
             });
         @endforeach
     </script>
+
 </body>
 </html>
