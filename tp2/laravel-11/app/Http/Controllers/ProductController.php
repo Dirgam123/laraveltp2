@@ -26,11 +26,11 @@ class ProductController extends Controller
      * @return void
      */
 
-     public function index(Request $request)
+public function index(Request $request) : View
 {
     // Get the search input, if any
     $search = $request->input('search');
-
+$products = Product::all();
     // Query to get products based on search input or get all products
     $products = Product::when($search, function ($query, $search) {
                     return $query->where('title', 'like', '%' . $search . '%');
@@ -38,11 +38,9 @@ class ProductController extends Controller
                 ->latest()
                 ->paginate(10);
 
-    // Get unread notifications
-    $notifications = Notification::where('is_read', false)->get();
-
-    // Render the view with the products, search query, and notifications
-    return view('products.index', compact('products', 'search', 'notifications'));
+                
+    // Render the view with the products and the search query
+    return view('products.index', compact('products', 'search'));
 }
 
 public function newtask($id)
@@ -87,33 +85,42 @@ public function updateDescription(Request $request, $id)
      * @param  mixed $request
      * @return RedirectResponse
      */
-    public function store(Request $request): RedirectResponse
-    {
-        //validate form
-        $request->validate([
-            'image'         => 'required|image|mimes:jpeg,jpg,png|max:2048',
-            'title'         => 'required|min:5',
-            'description'   => 'required|min:10',
-            'stock'         => 'required|numeric'
-        ]);
+public function store(Request $request): RedirectResponse
+{
+    // Validate form input
+    $request->validate([
+        'image'         => 'required|image|mimes:jpeg,jpg,png|max:2048',
+        'title'         => 'required|min:5',
+        'description'   => 'required|min:10',
+        'task_list'     => 'required|string', // Adjusted for task_list
+        'deadline'      => 'required|date',
+        'status'        => 'required|in:available,Done,Progress,Delayed',
+                'title' => 'required',
+        'task_list' => 'nullable|string',
+    ]);
 
-        //upload image
-        $image = $request->file('image');
-        $image->storeAs('public/products', $image->hashName());
+    // Upload the image
+    $image = $request->file('image');
+    $image->storeAs('public/products', $image->hashName());
 
-        //create product
-        Product::create([
-    'image'         => $image->hashName(),
-    'title'         => $request->title,
-    'description'   => $request->description,
-    'stock'         => $request->stock,
-    'deadline'      => $request->deadline,
-    'status'        => $request->status,
-        ]);
+    // Convert task_list to JSON format if it’s a comma-separated string
+$taskListArray = explode(',', $request->input('task_list'));
 
-        //redirect to index
-        return redirect()->route('products.index')->with(['success' => 'Data Berhasil Disimpan!']);
-    }
+    // Create product
+    Product::create([
+        'image'         => $image->hashName(),
+        'title'         => $request->title,
+        'description'   => $request->description,
+        'task_list'     => json_encode($request->task_list),
+        'deadline'      => $request->deadline,
+        'status'        => $request->status,
+        'title' => $request->title,
+        'task_list' => $taskListArray,
+    ]);
+
+    // Redirect to index
+    return redirect()->route('products.index')->with(['success' => 'Data Berhasil Disimpan!']);
+}
     
     /**
      * show
@@ -129,7 +136,22 @@ public function updateDescription(Request $request, $id)
         //render view with product
         return view('products.show', compact('product'));
     }
-    
+    public function updateTaskList(Request $request, $id)
+{
+    $product = Product::findOrFail($id);
+
+    // Validate task list (optional step depending on your requirements)
+    $request->validate([
+        'task_list' => 'required|string',
+    ]);
+
+    // Update the task list as a JSON array
+    $product->task_list = json_encode(explode(',', $request->task_list));
+    $product->save();
+
+    return redirect()->route('products.index')->with('success', 'Task list updated successfully.');
+}
+
     /**
      * edit
      *
@@ -152,8 +174,8 @@ public function updateDescription(Request $request, $id)
      * @param  mixed $id
      * @return RedirectResponse
      */
-    public function update(Request $request, $id): RedirectResponse
-    {
+public function update(Request $request, $id): RedirectResponse
+{
     // Validate form inputs
     $request->validate([
         'image'         => 'nullable|image|mimes:jpeg,jpg,png|max:2048', // 'nullable' means image is optional
@@ -161,15 +183,20 @@ public function updateDescription(Request $request, $id)
         'description'   => 'required|min:10',
         'stock'         => 'required|numeric',
         'deadline'      => 'required|date',
-        'status'        => 'required|string'
+        'status'        => 'required|string',
+        'task_list'     => 'required|string',
+         // Validate task list as a string
     ]);
 
     // Get the product by ID
     $product = Product::findOrFail($id);
 
+    // Prepare the task list as JSON
+ $taskListArray = explode(',', $request->input('task_list')); // Convert task list to array
+
+
     // Check if an image was uploaded
     if ($request->hasFile('image')) {
-
         // Upload new image
         $image = $request->file('image');
         $imageName = $image->hashName();
@@ -180,7 +207,7 @@ public function updateDescription(Request $request, $id)
             Storage::delete('public/products/' . $product->image);
         }
 
-        // Update product with new image
+        // Update product with new image and task list
         $product->update([
             'image'         => $imageName,
             'title'         => $request->title,
@@ -188,8 +215,9 @@ public function updateDescription(Request $request, $id)
             'stock'         => $request->stock,
             'deadline'      => $request->deadline,
             'status'        => $request->status,
+                    'title' => $request->title,
+        'task_list' => $taskListArray, // Save task list as JSON
         ]);
-
     } else {
         // Update product without changing the image
         $product->update([
@@ -198,12 +226,15 @@ public function updateDescription(Request $request, $id)
             'stock'         => $request->stock,
             'deadline'      => $request->deadline,
             'status'        => $request->status,
+                     'title' => $request->title,
+        'task_list' => $taskListArray,// Save task list as JSON
         ]);
     }
 
     // Redirect to index with success message
     return redirect()->route('products.index')->with(['success' => 'Product updated successfully!']);
-    }
+}
+
     
     /**
      * destroy

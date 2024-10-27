@@ -22,5 +22,10 @@ class Product extends Model
         'stock',
         'deadline',
         'status',
+        'task_list'
+    ];
+
+    protected $casts = [
+        'task_list' => 'array', 
     ];
 }

@@ -15,91 +15,63 @@
                 <div class="card border-0 shadow-sm rounded">
                     <div class="card-body">
                         <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
-                        
                             @csrf
 
                             <div class="form-group mb-3">
                                 <label class="font-weight-bold">IMAGE</label>
                                 <input type="file" class="form-control @error('image') is-invalid @enderror" name="image">
-                            
-                                <!-- error message untuk image -->
                                 @error('image')
-                                    <div class="alert alert-danger mt-2">
-                                        {{ $message }}
-                                    </div>
+                                    <div class="alert alert-danger mt-2">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="form-group mb-3">
                                 <label class="font-weight-bold">DEADLINE</label>
                                 <input type="date" class="form-control @error('deadline') is-invalid @enderror" name="deadline">
-                            
-                                <!-- error message untuk image -->
                                 @error('deadline')
-                                    <div class="alert alert-danger mt-2">
-                                        {{ $message }}
-                                    </div>
+                                    <div class="alert alert-danger mt-2">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="form-group mb-3">
                                 <label class="font-weight-bold">TITLE</label>
-                                <input type="text" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ old('title') }}" placeholder="Masukkan Judul Product">
-                            
-                                <!-- error message untuk title -->
+                                <input type="text" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ old('title') }}" placeholder="Enter Product Title">
                                 @error('title')
-                                    <div class="alert alert-danger mt-2">
-                                        {{ $message }}
-                                    </div>
+                                    <div class="alert alert-danger mt-2">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="form-group mb-3">
                                 <label class="font-weight-bold">DESCRIPTION</label>
-                                <textarea class="form-control @error('description') is-invalid @enderror" name="description" rows="5" placeholder="Masukkan Description Product">{{ old('description') }}</textarea>
-                            
-                                <!-- error message untuk description -->
+                                <textarea class="form-control @error('description') is-invalid @enderror" name="description" rows="5" placeholder="Enter Product Description">{{ old('description') }}</textarea>
                                 @error('description')
-                                    <div class="alert alert-danger mt-2">
-                                        {{ $message }}
-                                    </div>
+                                    <div class="alert alert-danger mt-2">{{ $message }}</div>
                                 @enderror
                             </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="form-group mb-3">
-            <label class="font-weight-bold">STATUS</label>
-<select class="form-control @error('status') is-invalid @enderror" name="status">
-    <option value="" disabled>Select Status</option>
-    <option value="available" {{ (old('status') ?? $product->status ?? '') == 'available' ? 'selected' : '' }}>Available</option>
-    <option value="Progress" {{ (old('status') ?? $product->status ?? '') == 'Progress' ? 'selected' : '' }}>Progress</option>
-    <option value="Delayed" {{ (old('status') ?? $product->status ?? '') == 'Delayed' ? 'selected' : '' }}>Delayed</option>
-    <option value="Done" {{ (old('status') ?? $product->status ?? '') == 'Done' ? 'selected' : '' }}>Done</option>
-</select>
-
-
-            
-            <!-- error message for status -->
-            @error('status')
-                <div class="alert alert-danger mt-2">
-                    {{ $message }}
-                </div>
-            @enderror
-        </div>
-    </div>
-</div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="font-weight-bold">STATUS</label>
+                                        <select class="form-control @error('status') is-invalid @enderror" name="status">
+                                            <option value="" disabled>Select Status</option>
+                                            <option value="available" {{ (old('status') ?? $product->status ?? '') == 'available' ? 'selected' : '' }}>Available</option>
+                                            <option value="Progress" {{ (old('status') ?? $product->status ?? '') == 'Progress' ? 'selected' : '' }}>Progress</option>
+                                            <option value="Delayed" {{ (old('status') ?? $product->status ?? '') == 'Delayed' ? 'selected' : '' }}>Delayed</option>
+                                            <option value="Done" {{ (old('status') ?? $product->status ?? '') == 'Done' ? 'selected' : '' }}>Done</option>
+                                        </select>
+                                        @error('status')
+                                            <div class="alert alert-danger mt-2">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
-                                        <label class="font-weight-bold">STOCK</label>
-                                        <input type="number" class="form-control @error('stock') is-invalid @enderror" name="stock" value="{{ old('stock') }}" placeholder="Masukkan Stock Product">
-                                    
-                                        <!-- error message untuk stock -->
-                                        @error('stock')
-                                            <div class="alert alert-danger mt-2">
-                                                {{ $message }}
-                                            </div>
+                                        <label class="font-weight-bold">TASK LIST</label>
+                                        <textarea class="form-control @error('task_list') is-invalid @enderror" name="task_list" rows="3" placeholder="Enter Task List, separated by commas">{{ old('task_list') }}</textarea>
+                                        @error('task_list')
+                                            <div class="alert alert-danger mt-2">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
@@ -118,7 +90,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.ckeditor.com/4.13.1/standard/ckeditor.js"></script>
     <script>
-        CKEDITOR.replace( 'description' );
+        CKEDITOR.replace('description');
     </script>
 </body>
 </html>
