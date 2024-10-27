@@ -47,10 +47,15 @@
                                         <td>{{ $product->title }}</td>
                                         <td>
                                             <ul>
-                                                @php
-                                                    // Check if task_list is a string or an array
-                                                    $taskList = is_array(json_decode($product->task_list)) ? json_decode($product->task_list) : explode(',', $product->task_list);
-                                                @endphp
+@php
+    // Check if task_list is a valid JSON string
+    $taskList = is_string($product->task_list) ? json_decode($product->task_list, true) : $product->task_list;
+
+    // Ensure $taskList is an array
+    if (!is_array($taskList)) {
+        $taskList = [];
+    }
+@endphp
                                                 @if (empty($taskList) || (is_array($taskList) && count($taskList) === 0))
                                                     <li>No tasks available</li>
                                                 @else
